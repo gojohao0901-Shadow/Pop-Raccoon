@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pop Raccoon!</title>
+  <style>
+    body {
+      background-color: #faf3e0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: "Comic Sans MS", sans-serif;
+      margin: 0;
+    }
+    img {
+      width: 300px;
+      cursor: pointer;
+      transition: 0.1s;
+      user-select: none;
+    }
+    h1 {
+      font-size: 2rem;
+      color: #444;
+      margin-bottom: 10px;
+    }
+    p {
+      font-size: 1.1rem;
+      color: #666;
+      margin: 5px 0;
+    }
+    button {
+      margin-top: 10px;
+      padding: 5px 15px;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 5px;
+      border: 1px solid #888;
+      background-color: #fff;
+      transition: 0.2s;
+    }
+    button:hover {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="counter">0</h1>
+  <p id="total">總點擊次數：0</p>
+  <img id="raccoon" src="raccoon_closed.png.jpg" alt="raccoon">
+  <audio id="popSound" src="pop_sound.mp3.mp3"></audio>
+  <button id="resetBtn">重置總點擊次數</button>
+
+  <script>
+    const img = document.getElementById("raccoon");
+    const sound = document.getElementById("popSound");
+    const counter = document.getElementById("counter");
+    const totalDisplay = document.getElementById("total");
+    const resetBtn = document.getElementById("resetBtn");
+
+    // 總次數與當前輪次
+    let totalClicks = parseInt(localStorage.getItem("totalClicks")) || 0;
+    let count = 0;
+    totalDisplay.textContent = `總點擊次數：${totalClicks}`;
+
+    // 防止鍵盤長按刷分
+    let keyDownLocked = false;
+
+    // Pop 函式
+    function doPop() {
+      count++;
+      totalClicks++;
+      counter.textContent = count;
+      totalDisplay.textContent = `總點擊次數：${totalClicks}`;
+      localStorage.setItem("totalClicks", totalClicks);
+
+      // 音效與動畫
+      sound.currentTime = 0;
+      sound.play();
+      img.src = "raccoon_open.png.jpg";
+      setTimeout(() => {
+        img.src = "raccoon_closed.png.jpg";
+      }, 300);
+    }
+
+    // 滑鼠點圖片：永遠有效
+    img.addEventListener("click", doPop);
+
+    // 鍵盤任意鍵：防長按
+    document.addEventListener("keydown", () => {
+      if (!keyDownLocked) {
+        doPop();
+        keyDownLocked = true;
+      }
+    });
+    document.addEventListener("keyup", () => {
+      keyDownLocked = false;
+    });
+
+    // 重置總點擊次數
+    resetBtn.addEventListener("click", () => {
+      totalClicks = 0;
+      localStorage.setItem("totalClicks", totalClicks);
+      totalDisplay.textContent = `總點擊次數：${totalClicks}`;
+    });
+  </script>
+</body>
+</html>
